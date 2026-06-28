@@ -2,6 +2,8 @@
 
 A person/device tracker card for Home Assistant. Displays home/away status with avatar images or initials, in either a large single-person view or a compact list for multiple people.
 
+<img width="1256" height="1039" alt="image" src="https://github.com/user-attachments/assets/d3944015-904c-4424-90dd-cfe5bb2fe90b" />
+
 ## Installation
 
 ### HACS (recommended)

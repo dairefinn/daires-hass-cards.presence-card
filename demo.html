@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Presence Card Demo</title>
+  <style>
+    body {
+      background: #f0f4f8;
+      font-family: sans-serif;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      padding: 32px;
+      justify-content: center;
+    }
+    h1 {
+      width: 100%;
+      text-align: center;
+      color: #333;
+      margin-bottom: 0;
+    }
+    h2 {
+      width: 100%;
+      font-size: 13px;
+      font-weight: 500;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 8px 0 0;
+    }
+    p.sub {
+      width: 100%;
+      text-align: center;
+      color: #666;
+      margin-top: 4px;
+    }
+    daires-hass-cards-presence-card {
+      width: 260px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Presence Card Demo</h1>
+  <p class="sub">Static previews — no Home Assistant required</p>
+
+  <h2>Examples</h2>
+  <daires-hass-cards-presence-card id="ex-home"></daires-hass-cards-presence-card>
+  <daires-hass-cards-presence-card id="ex-away"></daires-hass-cards-presence-card>
+  <daires-hass-cards-presence-card id="ex-zone"></daires-hass-cards-presence-card>
+  <daires-hass-cards-presence-card id="ex-multi"></daires-hass-cards-presence-card>
+
+  <h2>entity</h2>
+  <daires-hass-cards-presence-card id="entity-default"></daires-hass-cards-presence-card>
+  <daires-hass-cards-presence-card id="entity-name"></daires-hass-cards-presence-card>
+
+  <h2>entities (multi-person)</h2>
+  <daires-hass-cards-presence-card id="entities-2"></daires-hass-cards-presence-card>
+  <daires-hass-cards-presence-card id="entities-4"></daires-hass-cards-presence-card>
+
+  <h2>background</h2>
+  <daires-hass-cards-presence-card id="bg-white"></daires-hass-cards-presence-card>
+  <daires-hass-cards-presence-card id="bg-dark"></daires-hass-cards-presence-card>
+  <daires-hass-cards-presence-card id="bg-tinted"></daires-hass-cards-presence-card>
+
+  <h2>interactions</h2>
+  <daires-hass-cards-presence-card id="int-tap-more-info"></daires-hass-cards-presence-card>
+  <daires-hass-cards-presence-card id="int-tap-navigate"></daires-hass-cards-presence-card>
+  <daires-hass-cards-presence-card id="int-multi"></daires-hass-cards-presence-card>
+  <daires-hass-cards-presence-card id="int-multi-person"></daires-hass-cards-presence-card>
+
+  <script>
+    if (!customElements.get("ha-card")) {
+      customElements.define("ha-card", class extends HTMLElement {
+        connectedCallback() {
+          this.style.cssText = "display:block;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.15);overflow:hidden;";
+        }
+      });
+    }
+  </script>
+  <script src="presence-card.js"></script>
+  <script>
+    const mockHass = {
+      states: {
+        "person.alice": { state: "home",     attributes: { friendly_name: "Alice" } },
+        "person.bob":   { state: "not_home", attributes: { friendly_name: "Bob" } },
+        "person.carol": { state: "work",     attributes: { friendly_name: "Carol" } },
+        "person.dave":  { state: "home",     attributes: { friendly_name: "Dave" } },
+        "person.eve":   { state: "gym",      attributes: { friendly_name: "Eve" } },
+      },
+    };
+
+    function setup(id, config) {
+      const el = document.getElementById(id);
+      el.setConfig(config);
+      el.hass = mockHass;
+    }
+
+    // ── Examples ──────────────────────────────────────────────────────────────
+    setup("ex-home",  { entity: "person.alice" });
+    setup("ex-away",  { entity: "person.bob" });
+    setup("ex-zone",  { entity: "person.carol" });
+    setup("ex-multi", { title: "Family", entities: ["person.alice", "person.bob", "person.carol", "person.dave"] });
+
+    // ── entity ────────────────────────────────────────────────────────────────
+    // Friendly name comes from hass state attributes
+    setup("entity-default", { entity: "person.alice" });
+    // name overrides the display name
+    setup("entity-name", { entity: "person.alice", name: "Mum" });
+
+    // ── entities ──────────────────────────────────────────────────────────────
+    setup("entities-2", {
+      title: "Couple",
+      entities: ["person.alice", "person.bob"],
+    });
+    setup("entities-4", {
+      title: "Family",
+      entities: ["person.alice", "person.bob", "person.carol", "person.dave"],
+    });
+
+    // ── background ────────────────────────────────────────────────────────────
+    setup("bg-white",  { entity: "person.alice", background: "#ffffff" });
+    setup("bg-dark",   { entity: "person.alice", background: "#1c1c1e" });
+    setup("bg-tinted", { entity: "person.alice", background: "#e8f5e9" });
+
+    // ── interactions ──────────────────────────────────────────────────────────
+    setup("int-tap-more-info", { entity: "person.alice", interactions: [{ action: "more-info" }] });
+    setup("int-tap-navigate",  { entity: "person.bob",   interactions: [{ action: "navigate", path: "/lovelace/presence" }] });
+    setup("int-multi",         { entity: "person.alice", interactions: [{ trigger: "tap", action: "more-info" }, { trigger: "hold", action: "navigate", path: "/lovelace/presence" }] });
+    // Per-person tap: each row opens more-info for that specific person
+    setup("int-multi-person",  { title: "Family", entities: ["person.alice", "person.bob", "person.carol"], interactions: [{ action: "more-info" }] });
+
+    document.addEventListener("hass-more-info", (e) => alert(`more-info: ${e.detail.entityId}`));
+    document.addEventListener("location-changed", () => alert(`navigate: ${window.location.pathname}`));
+  </script>
+</body>
+</html>

@@ -38,6 +38,14 @@
     daires-hass-cards-presence-card {
       width: 260px;
     }
+    .fixed-height {
+      width: 260px;
+      height: 200px;
+    }
+    .fixed-height daires-hass-cards-presence-card {
+      width: 100%;
+      height: 100%;
+    }
   </style>
 </head>
 <body>
@@ -68,6 +76,10 @@
   <daires-hass-cards-presence-card id="int-tap-navigate"></daires-hass-cards-presence-card>
   <daires-hass-cards-presence-card id="int-multi"></daires-hass-cards-presence-card>
   <daires-hass-cards-presence-card id="int-multi-person"></daires-hass-cards-presence-card>
+
+  <h2>fixed height (simulates HA dashboard static height)</h2>
+  <div class="fixed-height"><daires-hass-cards-presence-card id="fixed-single"></daires-hass-cards-presence-card></div>
+  <div class="fixed-height"><daires-hass-cards-presence-card id="fixed-multi"></daires-hass-cards-presence-card></div>
 
   <script>
     if (!customElements.get("ha-card")) {
@@ -129,6 +141,10 @@
     setup("int-multi",         { entity: "person.alice", interactions: [{ trigger: "tap", action: "more-info" }, { trigger: "hold", action: "navigate", path: "/lovelace/presence" }] });
     // Per-person tap: each row opens more-info for that specific person
     setup("int-multi-person",  { title: "Family", entities: ["person.alice", "person.bob", "person.carol"], interactions: [{ action: "more-info" }] });
+
+    // ── fixed height ──────────────────────────────────────────────────────────
+    setup("fixed-single", { entity: "person.alice" });
+    setup("fixed-multi",  { title: "Family", entities: ["person.alice", "person.bob", "person.carol", "person.dave"] });
 
     document.addEventListener("hass-more-info", (e) => alert(`more-info: ${e.detail.entityId}`));
     document.addEventListener("location-changed", () => alert(`navigate: ${window.location.pathname}`));
